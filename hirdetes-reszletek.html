@@ -131,13 +131,79 @@
 
         if (form) {
             form.addEventListener('submit', function(event) {
-                event.preventDefault(); 
+                event.preventDefault(); // Megakadályozza az oldal újratöltődését
 
-                const nev = document.getElementById('nev').value;
-                const email = document.getElementById('email').value;
-                const telefonszam = document.getElementById('telefonszam').value;
-                const cim = document.getElementById('cim').value;
+                const nev = document.getElementById('nev').value.trim();
+                const email = document.getElementById('email').value.trim();
+                const telefonszam = document.getElementById('telefonszam').value.trim();
+                const cim = document.getElementById('cim').value.trim();
                 const kertMennyiseg = document.getElementById('kert_mennyiseg').value;
                 const aszfElfogadva = document.getElementById('elfogad_aszf').checked;
+                const megjegyzes = document.getElementById('megjegyzes').value.trim();
 
-                if (!nev || !email || !telefonszam ||
+
+                // Alaphelyzetbe állítjuk az üzenetet minden próbálkozásnál
+                formMessage.textContent = '';
+                formMessage.className = 'mt-4 text-sm'; // Alapértelmezett stílus
+
+                // Ellenőrizzük, hogy minden kötelező mező ki van-e töltve
+                if (!nev || !email || !telefonszam || !cim || !kertMennyiseg) {
+                    formMessage.textContent = 'Kérjük, töltse ki az összes csillaggal jelölt kötelező mezőt!';
+                    formMessage.className = 'mt-4 text-sm text-red-700 p-3 bg-red-100 border border-red-400 rounded-md';
+                    return; 
+                }
+
+                if (!aszfElfogadva) {
+                    formMessage.textContent = 'Kérjük, fogadja el az Adatkezelési Tájékoztatót és az Általános Szerződési Feltételeket az igénylés elküldéséhez!';
+                    formMessage.className = 'mt-4 text-sm text-red-700 p-3 bg-red-100 border border-red-400 rounded-md';
+                    return; 
+                }
+                
+                // Itt történne az űrlapadatok tényleges elküldése egy szervernek.
+                // Mivel ez egy kliensoldali példa, most csak szimuláljuk a sikeres küldést.
+                // Példa: egy fiktív API végpont meghívása
+                /*
+                fetch('/api/submit-igenyles', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        nev: nev,
+                        email: email,
+                        telefonszam: telefonszam,
+                        cim: cim,
+                        kert_mennyiseg: kertMennyiseg,
+                        megjegyzes: megjegyzes,
+                        aszf_elfogadva: aszfElfogadva
+                    }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Sikeres:', data);
+                    formMessage.textContent = 'Köszönjük! Igénylési kérelmét sikeresen fogadtuk. Munkatársaink hamarosan felveszik Önnel a kapcsolatot.';
+                    formMessage.className = 'mt-4 text-sm text-green-700 p-3 bg-green-100 border border-green-400 rounded-md';
+                    form.reset(); 
+                    document.getElementById('elfogad_aszf').checked = false;
+                })
+                .catch((error) => {
+                    console.error('Hiba:', error);
+                    formMessage.textContent = 'Hiba történt az igénylés elküldése közben. Kérjük, próbálja újra később.';
+                    formMessage.className = 'mt-4 text-sm text-red-700 p-3 bg-red-100 border border-red-400 rounded-md';
+                });
+                */
+
+                // Mivel nincs valós szerveroldali feldolgozás, itt közvetlenül a sikeres üzenetet jelenítjük meg:
+                console.log('Űrlap adatok:', { nev, email, telefonszam, cim, kertMennyiseg, megjegyzes, aszfElfogadva }); // Adatok kiírása a konzolra teszteléshez
+
+                formMessage.textContent = 'Köszönjük! Igénylési kérelmét sikeresen fogadtuk. Munkatársaink hamarosan felveszik Önnel a kapcsolatot.';
+                formMessage.className = 'mt-4 text-sm text-green-700 p-3 bg-green-100 border border-green-400 rounded-md';
+                
+                form.reset(); 
+                document.getElementById('elfogad_aszf').checked = false; // Biztosítjuk, hogy a checkbox is törlődjön
+
+            });
+        }
+    </script>
+</body>
+</html>
