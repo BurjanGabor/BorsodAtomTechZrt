@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Borsodban Nukleáris Erőmű - Kezdőlap</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f4f8;
+            color: #333;
+        }
+        .counter {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #FFFFFF;
+        }
+        .small-counter {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: white;
+        }
+        .hero {
+            background: linear-gradient(135deg, #1e90ff, #32cd32);
+            color: white;
+            padding: 3rem 0;
+            text-align: center;
+        }
+        .section {
+            padding: 2rem;
+            background: white;
+            margin: 1rem auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            max-width: 1000px;
+        }
+        nav {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+        }
+        nav a {
+            color: white;
+            margin: 0.5rem 1rem;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        nav a:hover {
+            text-decoration: underline;
+        }
+        header .container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+        }
+        header h1 { margin-bottom: 0.5rem; }
+
+        footer {
+            background: #333;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            margin-top: 2rem;
+        }
+        footer a {
+            color: #60a5fa;
+            text-decoration: none;
+        }
+        footer a:hover {
+            text-decoration: underline;
+        }
+        .progress-bar-container {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 0.5rem;
+            overflow: hidden;
+            margin-bottom: 0.5rem;
+        }
+        .progress-bar {
+            height: 1.5rem;
+            line-height: 1.5rem;
+            text-align: right;
+            padding-right: 0.5rem;
+            color: white;
+            font-weight: bold;
+            border-radius: 0.5rem 0 0 0.5rem;
+        }
+        .popup-ad {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background-color: #1f2937;
+            color: white;
+            padding: 1.5rem;
+            box-shadow: 0 -4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .popup-ad p { margin-bottom: 0.5rem; flex-grow: 1;}
+        .popup-ad .close-btn {
+            background: transparent;
+            color: white;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+        .popup-ad .details-btn {
+            background-color: #3b82f6;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .popup-ad .details-btn:hover {
+            background-color: #2563eb;
+        }
+        .chart-container-wrapper {
+             position: relative;
+        }
+    </style>
+</head>
+<body>
+    <header class="bg-gray-800 text-white p-4">
+        <div class="container mx-auto flex flex-wrap justify-between items-center">
+            <h1 class="text-2xl font-bold text-center md:text-left mb-2 md:mb-0">Borsod AtomTech Zrt.</h1>
+            <nav>
+                <a href="index.html">Kezdőlap</a>
+                <a href="properties.html">Erőmű Tulajdonságai</a>
+                <a href="contact.html">Kapcsolat</a>
+                <a href="hirek.html">Hírek</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="container mx-auto">
+            <h2 class="text-4xl font-bold mb-4">Üdvözöljük a Borsodban Erőműnél!</h2>
+            <p class="text-lg mb-6">Fenntartható energia Borsod szívében.</p>
+            <div class="flex flex-wrap justify-center items-center space-x-4 md:space-x-8 mb-6">
+                <div>
+                    <div class="counter" id="powerBlock1">0 MW</div>
+                    <p class="text-sm mt-1 md:mt-2" >Sajószentpéter I</p>
+                </div>
+                <div>
+                    <div class="counter" id="powerBlock2">0 MW</div>
+                    <p class="text-sm mt-1 md:mt-2">Sajószentpéter II</p>
+                </div>
+            </div>
+            <div>
+                <p class="text-md mt-1 md:mt-2">Balesetmentes napok száma:</p>
+                <div class="small-counter" id="accidentFreeDays">0</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="container mx-auto section">
+        <div>
+            <h3 class="text-2xl font-bold mb-6 text-center">Erőmű Adatok</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+                <div class="space-y-3">
+                    <p><strong>Hátralévő energia az üzemanyagban:</strong> <span id="remainingEnergy">50000 MWh</span></p>
+                    <p><strong>Napi CO2 megtakarítás:</strong> <span id="dailyCO2">115 tonna</span></p>
+                    <p><strong>Összes CO2 megtakarítás:</strong> <span id="totalCO2">3400 tonna</span></p>
+                    <p><strong>Hővel ellátott háztartások:</strong> 25000</p>
+                </div>
+                <div class="chart-container-wrapper w-full h-64 md:h-80">
+                    <canvas id="powerChart"></canvas>
+                </div>
+            </div>
+
+            <hr class="my-8 border-gray-300">
+
+            <h3 class="text-xl font-bold mb-4 text-center">Lakossági Távhő Árak Összehasonlítása (HUF/GJ)</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-center">
+                <div>
+                    <p class="mb-1 text-center font-semibold">Borsod AtomTech Zrt. Ára:</p>
+                    <p class="mb-1 text-center text-2xl text-green-600 font-bold"><span id="ourHeatPriceVal">900</span> HUF/GJ</p>
+                    <div class="progress-bar-container">
+                        <div id="ourHeatProgress" class="progress-bar bg-green-500" style="width: 0%;">
+                            <span id="ourHeatPricePercent"></span>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <p class="mb-1 text-center font-semibold">Környékbeli lakossági ár (Miskolc):</p>
+                     <p class="mb-1 text-center text-xl"><span id="localHeatPriceVal">2791</span> HUF/GJ</p>
+                    <div class="progress-bar-container">
+                        <div id="localHeatProgress" class="progress-bar bg-blue-500" style="width: 0%;">
+                            <span id="localHeatPricePercent"></span>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <p class="mb-1 text-center font-semibold">Országos lakossági átlagár (tájékoztató):</p>
+                    <p class="mb-1 text-center text-xl"><span id="nationalHeatPriceVal">2580</span> HUF/GJ</p>
+                    <div class="progress-bar-container">
+                        <div id="nationalHeatProgress" class="progress-bar bg-yellow-500" style="width: 0%;">
+                             <span id="nationalHeatPricePercent"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p class="text-xs text-center mt-3 text-gray-600">
+                Referencia maximum: <span id="maxPriceRef">4000</span> HUF/GJ.
+                <br>A környékbeli ár Miskolc lakossági díjszabása, a nemzeti ár pedig több magyarországi város lakossági díjszabásából számított tájékoztató jellegű átlagár alapján (Forrás: MK_23_139, 5. melléklet).
+            </p>
+        </div>
+    </section>
+
+    <footer>
+        <p>Kapcsolat: info@borsodban.hu | 
+           <a href="https://www.google.com/maps/place/Saj%C3%B3szentp%C3%A9ter" target="_blank">Sajószentpéter</a>, 
+           Borsod-Abaúj-Zemplén vármegye, Magyarország
+        </p>
+        <p>© <span id="currentYear"></span> Borsod AtomTech Zrt. Minden jog fenntartva.</p>
+    </footer>
+
+    <div id="popupAd" class="popup-ad">
+        <p><strong>Figyelem!</strong> Kedvezményes villamos energia igényelhető a térségben. 
+           <a href="hirdetes-reszletek.html" class="underline hover:text-blue-300">Tudjon meg többet!</a>
+        </p>
+        <div>
+            <a href="hirdetes-reszletek.html" class="details-btn mr-2">Részletek</a>
+            <button id="closePopupBtn" class="close-btn" aria-label="Bezárás">×</button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        function calculateAccidentFreeDays(startDateString) {
+            const startDate = new Date(startDateString);
+            const today = new Date();
+            const differenceInTime = today.getTime() - startDate.getTime();
+            const differenceInDays = Math.floor(differenceInTime / (1000 * 3600 * 24));
+            return differenceInDays;
+        }
+        const accidentDays = calculateAccidentFreeDays("2025-05-20"); // Minta kezdődátum
+        document.getElementById('accidentFreeDays').textContent = accidentDays;
+
+        // Számláló animáció a blokkokhoz
+        let powerBlock1 = 0;
+        let powerBlock2 = 0;
+        const targetPowerBlock1 = 77;
+        const targetPowerBlock2 = 77;
+        const counterBlock1 = document.getElementById('powerBlock1');
+        const counterBlock2 = document.getElementById('powerBlock2');
+
+        const interval1 = setInterval(() => {
+            if (powerBlock1 < targetPowerBlock1) {
+                powerBlock1 += 1;
+                counterBlock1.textContent = `${powerBlock1} MW`;
+            } else { clearInterval(interval1); }
+        }, 20);
+        const interval2 = setInterval(() => {
+            if (powerBlock2 < targetPowerBlock2) {
+                powerBlock2 += 1;
+                counterBlock2.textContent = `${powerBlock2} MW`;
+            } else { clearInterval(interval2); }
+        }, 20);
+
+        // Chart.js grafikon
+        const ctx = document.getElementById('powerChart').getContext('2d');
+        const chartParent = ctx.canvas.parentNode;
+        if (chartParent) {
+            const gradient = ctx.createLinearGradient(0, 0, 0, chartParent.offsetHeight);
+            gradient.addColorStop(0, 'rgba(30, 144, 255, 0.6)');
+            gradient.addColorStop(1, 'rgba(50, 205, 50, 0.1)');
+
+            const powerChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['06:00', '09:00', '12:00', '15:00', '18:00', '21:00'],
+                    datasets: [{
+                        label: 'Teljesítmény (MW)',
+                        data: [100, 105, 135, 144, 140, 135], // Adatsor a diagramhoz
+                        borderColor: '#1e90ff',
+                        borderWidth: 2,
+                        fill: true,
+                        backgroundColor: gradient,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                        }
+                    }
+                }
+            });
+        }
+
+        // Dinamikusan változó adatok
+        let currentDailyCO2 = 115.0;
+        let currentTotalCO2 = 3400.0;
+        let currentRemainingEnergy = 50000.0; // Kezdeti érték a hátralévő energiának
+
+        const dailyCO2Element = document.getElementById('dailyCO2');
+        const totalCO2Element = document.getElementById('totalCO2');
+        const remainingEnergyElement = document.getElementById('remainingEnergy');
+
+        // Kezdeti értékek beállítása
+        dailyCO2Element.textContent = `${currentDailyCO2.toFixed(1)} tonna`;
+        totalCO2Element.textContent = `${currentTotalCO2.toFixed(0)} tonna`;
+        remainingEnergyElement.textContent = `${currentRemainingEnergy.toFixed(1)} MWh`;
+
+        setInterval(() => {
+            // Napi CO2 megtakarítás növelése
+            currentDailyCO2 += 0.2; // Növekmény 2 másodpercenként
+            dailyCO2Element.textContent = `${currentDailyCO2.toFixed(1)} tonna`;
+
+            // Összes CO2 megtakarítás növelése a napi növekmény ütemében
+            currentTotalCO2 += 0.2; // Ugyanannyival növeljük, mint a napit
+            totalCO2Element.textContent = `${currentTotalCO2.toFixed(0)} tonna`;
+
+            // Hátralévő energia csökkentése
+            currentRemainingEnergy -= 0.1; // Csökkenés 2 másodpercenként
+            if (currentRemainingEnergy < 0) {
+                currentRemainingEnergy = 0; // Ne menjen mínuszba
+            }
+            remainingEnergyElement.textContent = `${currentRemainingEnergy.toFixed(1)} MWh`;
+
+        }, 2000); // Frissítés 2 másodpercenként
+
+        // Hőár Progressbarok Frissítése - Lakossági árak alapján
+        const ourPrice = 900;      // Ft/GJ - Borsod AtomTech Zrt. ára
+        const localPrice = 2791;   // Ft/GJ - Miskolc lakossági (MK_23_139, 5. mell.)
+        const nationalPrice = 2580;// Ft/GJ - Országos lakossági átlag (MK_23_139, 5. mell. alapján, tájékoztató)
+        const maxPrice = 4000;     // Ft/GJ - Referencia maximum lakossági árakhoz
+
+        document.getElementById('ourHeatPriceVal').textContent = ourPrice;
+        document.getElementById('localHeatPriceVal').textContent = localPrice;
+        document.getElementById('nationalHeatPriceVal').textContent = nationalPrice;
+        document.getElementById('maxPriceRef').textContent = maxPrice;
+
+        const ourPercent = (ourPrice / maxPrice) * 100;
+        const localPercent = (localPrice / maxPrice) * 100;
+        const nationalPercent = (nationalPrice / maxPrice) * 100;
+
+        document.getElementById('ourHeatProgress').style.width = `${ourPercent}%`;
+        if(document.getElementById('ourHeatPricePercent')) document.getElementById('ourHeatPricePercent').textContent = `${ourPercent.toFixed(1)}%`;
+        
+        document.getElementById('localHeatProgress').style.width = `${localPercent}%`;
+        if(document.getElementById('localHeatPricePercent')) document.getElementById('localHeatPricePercent').textContent = `${localPercent.toFixed(1)}%`;
+        
+        document.getElementById('nationalHeatProgress').style.width = `${nationalPercent}%`;
+        if(document.getElementById('nationalHeatPricePercent')) document.getElementById('nationalHeatPricePercent').textContent = `${nationalPercent.toFixed(1)}%`;
+
+        // Felugró Hirdetés Kezelése
+        const popupAd = document.getElementById('popupAd');
+        const closePopupBtn = document.getElementById('closePopupBtn');
+
+        if (!sessionStorage.getItem('popupAdDismissed')) {
+            setTimeout(() => { 
+                 if(popupAd) popupAd.style.display = 'flex';
+            }, 2000);
+        }
+
+        if(closePopupBtn) {
+            closePopupBtn.addEventListener('click', () => {
+                if(popupAd) popupAd.style.display = 'none';
+                sessionStorage.setItem('popupAdDismissed', 'true');
+            });
+        }
+    </script>
+</body>
+</html>

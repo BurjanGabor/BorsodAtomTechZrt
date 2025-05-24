@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kapcsolat - Borsod AtomTech Zrt.</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f4f8;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .content-wrapper {
+            flex-grow: 1;
+        }
+        nav { display: flex; flex-wrap: wrap; justify-content: center; align-items: center;}
+        nav a { color: white; margin: 0.5rem 1rem; text-decoration: none; font-weight: bold; }
+        nav a:hover { text-decoration: underline; }
+        header .container { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; }
+        header h1 { margin-bottom: 0.5rem; }
+        footer { background: #333; color: white; padding: 1rem; text-align: center; margin-top: auto; }
+        footer a { color: #60a5fa; text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+        .content-section {
+            padding: 1.5rem;
+            background: white;
+            margin: 2rem auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            max-width: 800px;
+        }
+        .contact-card {
+            border: 1px solid #ddd;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            background-color: #f9f9f9;
+            display: flex;
+            flex-direction: column; 
+            sm:flex-direction: row; 
+            align-items: center;
+            gap: 1rem; 
+        }
+        .contact-card img {
+            border-radius: 50%;
+            width: 80px; 
+            height: 80px;
+            object-fit: cover;
+            flex-shrink: 0; 
+        }
+        .contact-info { text-align: center; sm:text-left; } 
+        .contact-info h4 { color: #1e90ff; }
+        .contact-info p { word-break: break-word; } 
+    </style>
+</head>
+<body>
+    <div class="content-wrapper">
+        <header class="bg-gray-800 text-white p-4">
+            <div class="container mx-auto">
+                <h1 class="text-2xl font-bold text-center md:text-left mb-2 md:mb-0">Borsod AtomTech Zrt.</h1>
+                <nav>
+                    <a href="index.html">Kezdőlap</a>
+                    <a href="properties.html">Erőmű Tulajdonságai</a>
+                    <a href="contact.html">Kapcsolat</a>
+                    <a href="hirek.html">Hírek</a>
+                </nav>
+            </div>
+        </header>
+
+        <main class="container mx-auto mt-8 px-4 sm:px-0">
+            <section class="content-section">
+                <h2 class="text-3xl font-bold mb-6 text-center">Kapcsolatfelvétel</h2>
+                <p class="text-lg mb-8 text-center">Lépjen kapcsolatba velünk az alábbi elérhetőségeken, vagy kérdéseivel forduljon munkatársainkhoz.</p>
+                
+                <div class="space-y-6">
+                    <div class="contact-card">
+                        <img src="C:\Users\Rendszergazda\Desktop\Borsod5\panni.jpg">
+                        <div class="contact-info">
+                            <h4 class="text-xl font-semibold mb-1">Plutónium Panna</h4>
+                            <p class="text-md text-gray-700">Erőmű Igazgató</p>
+                            <p class="text-md text-gray-600">E-mail: <a href="mailto:kiss.pal@borsodatom.example.com" class="text-blue-500 hover:underline">plutonium.panna@borsodatom.com</a></p>
+                            <p class="text-md text-gray-600">Telefon: +36 20 123 4567</p>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-card">
+                        <img src="C:\Users\Rendszergazda\Desktop\Borsod5\bence.jpg">
+                        <div class="contact-info">
+                            <h4 class="text-xl font-semibold mb-1">Barátságos Bence</h4>
+                            <p class="text-md text-gray-700">Kommunikációs Vezető</p>
+                            <p class="text-md text-gray-600">E-mail: <a href="mailto:nagy.anna@borsodatom.example.com" class="text-blue-500 hover:underline">baratsagos.bence@borsodatom.com</a></p>
+                            <p class="text-md text-gray-600">Telefon: +36 30 987 6543</p>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-card">
+                        <img src="C:\Users\Rendszergazda\Desktop\Borsod5\gabor.jpg">
+                        <div class="contact-info">
+                            <h4 class="text-xl font-semibold mb-1">Gépzsír Gábor</h4>
+                            <p class="text-md text-gray-700">Üzemeltetési Főmérnök</p>
+                            <p class="text-md text-gray-600">E-mail: <a href="mailto:kovacs.bela@borsodatom.example.com" class="text-blue-500 hover:underline">gepzsir.gabor@borsodatom.com</a></p>
+                            <p class="text-md text-gray-600">Telefon: +36 70 555 1234</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-10 text-center">
+                    <h3 class="text-2xl font-bold mb-3">Központi Elérhetőségünk</h3>
+                    <p class="text-lg"><strong>Cím:</strong> 3770 Sajószentpéter, Erőmű út 1.</p>
+                    <p class="text-lg"><strong>Telefon:</strong> +36 48 555 000</p>
+                    <p class="text-lg"><strong>Általános e-mail:</strong> <a href="mailto:info@eromuborsodban.hu" class="text-blue-500 hover:underline">info@borsodban.hu</a></p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <footer>
+        <p>Kapcsolat: info@borsodban.hu | 
+           <a href="https://www.google.com/maps/place/Saj%C3%B3szentp%C3%A9ter" target="_blank">Sajószentpéter</a>, 
+           Borsod-Abaúj-Zemplén vármegye, Magyarország
+        </p>
+        <p>© <span id="currentYearFooterContact"></span> Borsod AtomTech Zrt. Minden jog fenntartva.</p>
+    </footer>
+    <script>
+        document.getElementById('currentYearFooterContact').textContent = new Date().getFullYear();
+    </script>
+</body>
+</html>
