@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Erőmű Tulajdonságai - Borsod AtomTech Zrt.</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f4f8;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .content-wrapper {
+            flex-grow: 1;
+        }
+        nav { display: flex; flex-wrap: wrap; justify-content: center; align-items: center;}
+        nav a { color: white; margin: 0.5rem 1rem; text-decoration: none; font-weight: bold; }
+        nav a:hover { text-decoration: underline; }
+        header .container { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; }
+        header h1 { margin-bottom: 0.5rem; }
+        footer { background: #333; color: white; padding: 1rem; text-align: center; margin-top: auto; }
+        footer a { color: #60a5fa; text-decoration: none; }
+        footer a:hover { text-decoration: underline; }
+        .content-section {
+            padding: 1.5rem; 
+            background: white;
+            margin: 2rem auto;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            max-width: 800px;
+        }
+        .info-image {
+            width: 100%;
+            max-width: 700px; 
+            height: auto;
+            border-radius: 8px;
+            margin: 2rem auto; 
+            display: block;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+    </style>
+</head>
+<body>
+    <div class="content-wrapper">
+        <header class="bg-gray-800 text-white p-4">
+            <div class="container mx-auto">
+                <h1 class="text-2xl font-bold text-center md:text-left mb-2 md:mb-0">Borsod AtomTech Zrt.</h1>
+                <nav>
+                    <a href="index.html">Kezdőlap</a>
+                    <a href="properties.html">Erőmű Tulajdonságai</a>
+                    <a href="contact.html">Kapcsolat</a>
+                    <a href="hirek.html">Hírek</a>
+                </nav>
+            </div>
+        </header>
+
+        <main class="container mx-auto mt-8 px-4 sm:px-0">
+            <section class="content-section">
+                <h2 class="text-3xl font-bold mb-6 text-center">Az Erőmű Főbb Tulajdonságai</h2>
+                
+                <img src="C:\Users\Rendszergazda\Desktop\Borsod5\nuscale.jpg" 
+                     alt="Modern Erőmű Technológia" 
+                     class="info-image">
+
+                <div class="placeholder-notice bg-blue-100 border-blue-300 text-blue-800 p-4 rounded-md mb-6">
+                    <p><strong>Információ:</strong> Az alábbi tartalom általános jellegű, inspirálódva a modern kis moduláris reaktor (SMR) technológiákból. A konkrét adatok eltérhetnek.</p>
+                </div>
+
+                <h3 class="text-2xl font-semibold mt-6 mb-3">Általános Leírás</h3>
+                <p class="text-lg mb-4">
+                    A Borsod AtomTech Zrt. által tervezett sajószentpéteri nukleáris erőmű a legújabb generációs kis moduláris reaktor (SMR) technológián alapulna, amely kiemelkedő biztonságot, rugalmasságot és alacsonyabb szén-dioxid-kibocsátást kínál. Célunk a régió tiszta és megbízható energiaellátásának biztosítása.
+                </p>
+
+                <h3 class="text-2xl font-semibold mt-6 mb-3">Főbb Műszaki Jellemzők (NuScale Power Module alapján)</h3>
+                <ul class="list-disc list-inside mb-4 text-lg space-y-1">
+                    <li><strong>Technológia:</strong> Kis Moduláris Reaktor (SMR), nyomottvizes (PWR) kialakítás</li>
+                    <li><strong>Modul teljesítménye:</strong> Egyenként kb. 77 MWe (villamos)</li>
+                    <li><strong>Telepített blokkok (tervezett):</strong> 2 modul (Sajószentpéter 1 és 2), összesen kb. 154 MWe</li>
+                    <li><strong>Biztonság:</strong> Passzív biztonsági rendszerek, amelyek külső beavatkozás vagy áramellátás nélkül is képesek a reaktort biztonságos állapotban tartani.</li>
+                    <li><strong>Moduláris felépítés:</strong> Gyárilag készített modulok, amelyek csökkentik az építési időt és költségeket.</li>
+                    <li><strong>Rugalmasság:</strong> A modulok egymástól függetlenül üzemeltethetők és karbantarthatók.</li>
+                </ul>
+
+                <h3 class="text-2xl font-semibold mt-6 mb-3">Környezeti Hatások</h3>
+                <p class="text-lg mb-4">
+                    Az SMR technológia jelentősen hozzájárul a dekarbonizációs célok eléréséhez. Kisméretű lábnyoma és a fejlett biztonsági jellemzők minimalizálják a környezeti terhelést.
+                </p>
+                
+                <p class="text-lg mt-6">
+                    További részletes műszaki információkért és a technológia mélyebb megértéséért kérjük, látogasson el a NuScale Power hivatalos oldalára:
+                    <br>
+                    <a href="https://www.nuscalepower.com/products/nuscale-power-module" id="sourceLink" target="_blank" class="text-blue-500 hover:underline break-all">NuScale Power Module - Termékleírás</a>
+                </p>
+            </section>
+        </main>
+    </div>
+
+    <footer>
+        <p>Kapcsolat: info@borsodban.hu | 
+           <a href="https://www.google.com/maps/place/Saj%C3%B3szentp%C3%A9ter" target="_blank">Sajószentpéter</a>, 
+           Borsod-Abaúj-Zemplén vármegye, Magyarország
+        </p>
+        <p>© <span id="currentYearFooter"></span> Borsod AtomTech Zrt. Minden jog fenntartva.</p>
+    </footer>
+    <script>
+        document.getElementById('currentYearFooter').textContent = new Date().getFullYear();
+    </script>
+</body>
+</html>
