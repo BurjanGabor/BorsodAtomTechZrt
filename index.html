@@ -249,137 +249,212 @@
         </div>
     </div>
 
-    <script>
-        document.getElementById('currentYear').textContent = new Date().getFullYear();
+     <script>
+    document.getElementById('currentYear').textContent = new Date().getFullYear();
 
-        const operationalStartDate = new Date("2025-05-25T00:00:00"); 
+    const operationalStartDate = new Date("2025-05-20T00:00:00"); // Ez már definiálva van
 
-        function calculateAccidentFreeDays() {
-            const today = new Date();
-            const startDateForAccidentDays = new Date(operationalStartDate.getFullYear(), operationalStartDate.getMonth(), operationalStartDate.getDate());
-            const todayForAccidentDays = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-            
-            const differenceInTime = todayForAccidentDays.getTime() - startDateForAccidentDays.getTime();
-            if (differenceInTime < 0) return 0; 
-            const differenceInDays = Math.floor(differenceInTime / (1000 * 3600 * 24));
-            return differenceInDays;
+    function calculateAccidentFreeDays() {
+        const today = new Date();
+        const startDateForAccidentDays = new Date(operationalStartDate.getFullYear(), operationalStartDate.getMonth(), operationalStartDate.getDate());
+        const todayForAccidentDays = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+        
+        const differenceInTime = todayForAccidentDays.getTime() - startDateForAccidentDays.getTime();
+        if (differenceInTime < 0) return 0; 
+        const differenceInDays = Math.floor(differenceInTime / (1000 * 3600 * 24));
+        return differenceInDays;
+    }
+    document.getElementById('accidentFreeDays').textContent = calculateAccidentFreeDays();
+
+    // Számláló animáció a blokkokhoz
+    let powerBlock1 = 0;
+    let powerBlock2 = 0;
+    const targetPowerBlock1 = 150;
+    const targetPowerBlock2 = 150;
+    const counterBlock1 = document.getElementById('powerBlock1');
+    const counterBlock2 = document.getElementById('powerBlock2');
+
+    const interval1 = setInterval(() => {
+        if (powerBlock1 < targetPowerBlock1) {
+            powerBlock1 += Math.ceil((targetPowerBlock1 - powerBlock1) / 15);
+            if (powerBlock1 > targetPowerBlock1) powerBlock1 = targetPowerBlock1;
+            counterBlock1.textContent = `${powerBlock1} MW`;
+        } else { clearInterval(interval1); }
+    }, 50);
+    const interval2 = setInterval(() => {
+        if (powerBlock2 < targetPowerBlock2) {
+            powerBlock2 += Math.ceil((targetPowerBlock2 - powerBlock2) / 15);
+            if (powerBlock2 > targetPowerBlock2) powerBlock2 = targetPowerBlock2;
+            counterBlock2.textContent = `${powerBlock2} MW`;
+        } else { clearInterval(interval2); }
+    }, 50);
+
+    // Dinamikusan változó adatokhoz szükséges kapacitás (már létezik a kódban)
+    const plantTotalCapacityMW = targetPowerBlock1 + targetPowerBlock2; // Ez 300 MW
+
+    /**
+     * Generálja a diagramhoz szükséges címkéket és adatokat az elmúlt 12 órára.
+     * @param {Date} opStartDate Az erőmű működésének kezdete.
+     * @param {number} totalCapacity Az erőmű teljes kapacitása MW-ban.
+     * @returns {object} Objektum { labels: string[], data: number[] } formátumban.
+     */
+    function generateDynamicChartData(opStartDate, totalCapacity) {
+        const labels = [];
+        const data = [];
+        const now = new Date();
+        // Ellenőrizzük, hogy az erőmű globálisan működik-e már
+        const isGloballyOperational = now >= opStartDate;
+
+        for (let i = 0; i < 7; i++) { // 7 adatpont a 12 órás időablakhoz (6 db 2 órás intervallum)
+            const pointInTime = new Date(now);
+            // Az aktuális címkéhez tartozó órát számoljuk ki.
+            // Visszafelé haladunk 12 órát, 2 órás lépésekben az aktuális óráig.
+            // hoursAgo értékei: 12, 10, 8, 6, 4, 2, 0
+            const hoursAgo = 12 - (i * 2);
+            pointInTime.setHours(now.getHours() - hoursAgo, 0, 0, 0); // Perc, másodperc, ezredmásodperc nullázása a tiszta órás címkéért
+
+            labels.push(`${String(pointInTime.getHours()).padStart(2, '0')}:00`);
+
+            // Meghatározzuk, hogy ez a konkrét időpont a diagramon belül van-e a működési periódusban
+            if (!isGloballyOperational || pointInTime < opStartDate) {
+                data.push(0); // Ha még nem működik, vagy az adott időpont a működés előtt van, 0 legyen az adat
+            } 
+		else {
+                // Pszeudo-véletlenszerű adat generálása, ha az erőmű működik ebben az időpontban
+                // Értékek a kapacitás 70%-a és 98%-a között.
+                const minProd = totalCapacity * 0.70; // pl. 210 MW (300 MW kapacitás esetén)
+                const maxProd = totalCapacity * 1; // pl. 294 MW (300 MW kapacitás esetén)
+                const randomDataPoint = Math.floor(Math.random() * (maxProd - minProd + 1)) + minProd;
+                data.push(randomDataPoint);
+            }
         }
-        document.getElementById('accidentFreeDays').textContent = calculateAccidentFreeDays();
+        return { labels, data };
+    }
 
-        // Számláló animáció a blokkokhoz
-        let powerBlock1 = 0;
-        let powerBlock2 = 0;
-        const targetPowerBlock1 = 150; // ÚJ ÉRTÉK
-        const targetPowerBlock2 = 150; // ÚJ ÉRTÉK
-        const counterBlock1 = document.getElementById('powerBlock1');
-        const counterBlock2 = document.getElementById('powerBlock2');
+    // Chart.js grafikon
+    const ctx = document.getElementById('powerChart').getContext('2d');
+    const chartParent = ctx.canvas.parentNode;
+    let powerChart = null; // Deklaráljuk itt, hogy a setInterval-ból is elérhető legyen
 
-        const interval1 = setInterval(() => {
-            if (powerBlock1 < targetPowerBlock1) {
-                powerBlock1 += Math.ceil((targetPowerBlock1 - powerBlock1) / 15); // Gyorsabb animáció
-                if (powerBlock1 > targetPowerBlock1) powerBlock1 = targetPowerBlock1;
-                counterBlock1.textContent = `${powerBlock1} MW`;
-            } else { clearInterval(interval1); }
-        }, 50); // Gyorsabb frissítés az animációhoz
-        const interval2 = setInterval(() => {
-            if (powerBlock2 < targetPowerBlock2) {
-                powerBlock2 += Math.ceil((targetPowerBlock2 - powerBlock2) / 15); // Gyorsabb animáció
-                if (powerBlock2 > targetPowerBlock2) powerBlock2 = targetPowerBlock2;
-                counterBlock2.textContent = `${powerBlock2} MW`;
-            } else { clearInterval(interval2); }
-        }, 50); // Gyorsabb frissítés az animációhoz
+    if (chartParent) {
+        const initialChartData = generateDynamicChartData(operationalStartDate, plantTotalCapacityMW);
+        const gradient = ctx.createLinearGradient(0, 0, 0, chartParent.offsetHeight);
+        gradient.addColorStop(0, 'rgba(30, 144, 255, 0.6)');
+        gradient.addColorStop(1, 'rgba(50, 205, 50, 0.1)');
 
-
-        // Chart.js grafikon
-        const ctx = document.getElementById('powerChart').getContext('2d');
-        const chartParent = ctx.canvas.parentNode;
-        if (chartParent) {
-            const gradient = ctx.createLinearGradient(0, 0, 0, chartParent.offsetHeight);
-            gradient.addColorStop(0, 'rgba(30, 144, 255, 0.6)');
-            gradient.addColorStop(1, 'rgba(50, 205, 50, 0.1)');
-
-            const powerChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['06:00', '09:00', '12:00', '15:00', '18:00', '21:00'],
-                    datasets: [{
-                        label: 'Teljesítmény (MW)',
-                        data: [220, 240, 270, 285, 275, 300], // ÚJ ADATSOR a 300MW kapacitáshoz
-                        borderColor: '#1e90ff',
-                        borderWidth: 2,
-                        fill: true, 
-                        backgroundColor: gradient, 
-                        tension: 0.1 
-                    }]
+        powerChart = new Chart(ctx, { // Hozzárendeljük a külső hatókörű powerChart változóhoz
+            type: 'line',
+            data: {
+                labels: initialChartData.labels, // Dinamikus címkék használata
+                datasets: [{
+                    label: 'Teljesítmény (MW)',
+                    data: initialChartData.data,  // Dinamikus adatok használata
+                    borderColor: '#1e90ff',
+                    borderWidth: 2,
+                    fill: true,
+                    backgroundColor: gradient,
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        suggestedMax: plantTotalCapacityMW * 1.1 // Y tengely javasolt maximuma a kapacitás felett kicsivel
+                    }
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: { y: { beginAtZero: true, suggestedMax: 320 } }, // Y tengely max javaslat
-                    plugins: { legend: { display: true, position: 'top' } }
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    }
                 }
-            });
+            }
+        });
+
+        // Időzítő beállítása a diagram adatainak periodikus frissítésére
+        setInterval(() => {
+            if (powerChart) { // Ellenőrizzük, hogy a diagram létezik-e
+                const newData = generateDynamicChartData(operationalStartDate, plantTotalCapacityMW);
+                powerChart.data.labels = newData.labels;
+                powerChart.data.datasets[0].data = newData.data;
+                powerChart.update(); // 'none' argumentummal animáció nélkül frissít: powerChart.update('none');
+            }
+        }, 15 * 60 * 1000); // Frissítés minden 15. percben (szükség szerint módosítható)
+    }
+
+    // Dinamikusan változó adatok (a CO2 és energia számlálók)
+    const dailyCO2Element = document.getElementById('dailyCO2');
+    // ... (a szkript többi része változatlan marad: updateCounters, hőár progress barok, felugró hirdetés) ...
+    // Fontos, hogy az updateCounters függvény és a többi rész a helyén maradjon.
+    // Az `updateCounters` függvény már tartalmazza a `plantTotalCapacityMW` definícióját.
+
+    // updateCounters függvény definíciója (már létezik a kódban)
+    function updateCounters() {
+        const now = new Date();
+        
+        const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+        let hoursSinceMidnightToday = (now.getTime() - startOfToday.getTime()) / (1000 * 60 * 60);
+        if (hoursSinceMidnightToday < 0) hoursSinceMidnightToday = 0;
+
+        // Kezeli azt az esetet, ha az operationalStartDate a mai napon van, de még nem érkezett el
+        // vagy ha az operationalStartDate a jövőben van.
+        if (operationalStartDate > startOfToday && operationalStartDate > now) { // Teljesen a jövőben van
+             hoursSinceMidnightToday = 0;
+        } else if (operationalStartDate > startOfToday && operationalStartDate <= now) { // Ma kezdődik, de még nem telt el a teljes nap
+            const millisecondsSinceOpStartToday = now.getTime() - operationalStartDate.getTime();
+            hoursSinceMidnightToday = Math.max(0, millisecondsSinceOpStartToday / (1000 * 60 * 60));
+        } else if (operationalStartDate <= startOfToday) {
+            // Normál működés, a mai nap 0 órától számolunk, ha már működik a rendszer.
+            // hoursSinceMidnightToday már helyesen van kalkulálva.
         }
 
-        // Dinamikusan változó adatok
-        const dailyCO2Element = document.getElementById('dailyCO2');
+
+        const co2SavedPerMWh = 0.5;
+        const co2SavedPerHour = plantTotalCapacityMW * co2SavedPerMWh;
+        const currentDailyCO2 = hoursSinceMidnightToday * co2SavedPerHour;
+        if(dailyCO2Element) dailyCO2Element.textContent = `${currentDailyCO2.toFixed(1)} tonna`;
+
+        const energyGeneratedPerHour = plantTotalCapacityMW;
+        const currentDailyEnergyGenerated = hoursSinceMidnightToday * energyGeneratedPerHour;
+        const dailyEnergyGeneratedElement = document.getElementById('dailyEnergyGenerated');
+        if(dailyEnergyGeneratedElement) dailyEnergyGeneratedElement.textContent = `${currentDailyEnergyGenerated.toFixed(0)} MWh`;
+
+        const totalOperationalMilliseconds = now.getTime() - operationalStartDate.getTime();
+        
         const totalCO2Element = document.getElementById('totalCO2');
         const remainingEnergyElement = document.getElementById('remainingEnergy');
-        const dailyEnergyGeneratedElement = document.getElementById('dailyEnergyGenerated');
+        const initialEnergyInFuel = 5256000; // MWh
 
-        const plantTotalCapacityMW = targetPowerBlock1 + targetPowerBlock2; // Most 300 MW
-        const co2SavedPerMWh = 0.5; 
-        const co2SavedPerHour = plantTotalCapacityMW * co2SavedPerMWh; 
-
-        const initialEnergyInFuel = 5256000; // MWh (kb. 2 évre elegendő 300 MW-on)
-        const energyGeneratedPerHour = plantTotalCapacityMW; 
-
-        function updateCounters() {
-            const now = new Date();
-            
-            const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
-            let hoursSinceMidnightToday = (now.getTime() - startOfToday.getTime()) / (1000 * 60 * 60);
-            if (hoursSinceMidnightToday < 0) hoursSinceMidnightToday = 0;
-
-            if (operationalStartDate > startOfToday && operationalStartDate > now) {
-                 hoursSinceMidnightToday = 0;
-            } else if (operationalStartDate > startOfToday && operationalStartDate <= now) {
-                const millisecondsSinceOpStartToday = now.getTime() - operationalStartDate.getTime();
-                hoursSinceMidnightToday = millisecondsSinceOpStartToday / (1000 * 60 * 60);
-                if (hoursSinceMidnightToday < 0) hoursSinceMidnightToday = 0;
-            }
-
-            const currentDailyCO2 = hoursSinceMidnightToday * co2SavedPerHour;
-            if(dailyCO2Element) dailyCO2Element.textContent = `${currentDailyCO2.toFixed(1)} tonna`;
-
-            const currentDailyEnergyGenerated = hoursSinceMidnightToday * energyGeneratedPerHour;
-            if(dailyEnergyGeneratedElement) dailyEnergyGeneratedElement.textContent = `${currentDailyEnergyGenerated.toFixed(0)} MWh`;
-
-            const totalOperationalMilliseconds = now.getTime() - operationalStartDate.getTime();
-            
-            if (totalOperationalMilliseconds < 0) { 
-                if(totalCO2Element) totalCO2Element.textContent = `0 tonna`;
-                if(remainingEnergyElement) remainingEnergyElement.textContent = `${initialEnergyInFuel.toFixed(0)} MWh`;
-                if(dailyCO2Element) dailyCO2Element.textContent = `0.0 tonna`;
-                if(dailyEnergyGeneratedElement) dailyEnergyGeneratedElement.textContent = `0 MWh`;
-                document.getElementById('accidentFreeDays').textContent = 0;
-                return;
-            }
-            const totalOperationalHours = totalOperationalMilliseconds / (1000 * 60 * 60);
-
-            const currentTotalCO2 = totalOperationalHours * co2SavedPerHour;
-            if(totalCO2Element) totalCO2Element.textContent = `${currentTotalCO2.toFixed(0)} tonna`;
-
-            const energyConsumedTotal = totalOperationalHours * energyGeneratedPerHour;
-            let currentRemainingEnergy = initialEnergyInFuel - energyConsumedTotal;
-            if (currentRemainingEnergy < 0) {
-                currentRemainingEnergy = 0;
-            }
-            if(remainingEnergyElement) remainingEnergyElement.textContent = `${currentRemainingEnergy.toFixed(0)} MWh`;
+        if (totalOperationalMilliseconds < 0) { 
+            if(totalCO2Element) totalCO2Element.textContent = `0 tonna`;
+            if(remainingEnergyElement) remainingEnergyElement.textContent = `${initialEnergyInFuel.toFixed(0)} MWh`;
+            if(dailyCO2Element) dailyCO2Element.textContent = `0.0 tonna`; // Biztosítjuk, hogy nulla legyen, ha nem indult el
+            if(dailyEnergyGeneratedElement) dailyEnergyGeneratedElement.textContent = `0 MWh`; // Biztosítjuk, hogy nulla legyen, ha nem indult el
+            if(document.getElementById('accidentFreeDays')) document.getElementById('accidentFreeDays').textContent = 0; // Balesetmentes napok is 0
+            return;
         }
+        const totalOperationalHours = totalOperationalMilliseconds / (1000 * 60 * 60);
+
+        const currentTotalCO2 = totalOperationalHours * co2SavedPerHour;
+        if(totalCO2Element) totalCO2Element.textContent = `${currentTotalCO2.toFixed(0)} tonna`;
+
+        const energyConsumedTotal = totalOperationalHours * energyGeneratedPerHour;
+        let currentRemainingEnergy = initialEnergyInFuel - energyConsumedTotal;
+        if (currentRemainingEnergy < 0) {
+            currentRemainingEnergy = 0;
+        }
+        if(remainingEnergyElement) remainingEnergyElement.textContent = `${currentRemainingEnergy.toFixed(0)} MWh`;
         
-        updateCounters(); 
-        setInterval(updateCounters, 5000);
+        // Balesetmentes napok frissítése itt is, ha az updateCounters felel érte
+        if(document.getElementById('accidentFreeDays')) document.getElementById('accidentFreeDays').textContent = calculateAccidentFreeDays();
+    }
+    
+    updateCounters(); 
+    setInterval(updateCounters, 5000);
+
 
         // Hőár Progressbarok
         const ourPrice = 900;
