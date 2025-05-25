@@ -12,15 +12,20 @@
             background-color: #f0f4f8;
             color: #333;
         }
-        .counter {
+        .counter { /* Fő számlálók (MW) */
             font-size: 2.5rem;
             font-weight: bold;
-            color: #FFFFFF;
+            color: #FFFFFF; 
         }
-        .small-counter {
+        .secondary-counter-value { /* Kisebb, kiegészítő számlálók értékei */
             font-size: 1.8rem;
             font-weight: bold;
             color: white;
+        }
+        .secondary-counter-label { /* Kisebb, kiegészítő számlálók címkéi */
+            font-size: 1rem; 
+            color: white;
+            margin-top: 0.25rem;
         }
         .hero {
             background: linear-gradient(135deg, #1e90ff, #32cd32);
@@ -150,16 +155,22 @@
             <div class="flex flex-wrap justify-center items-center space-x-4 md:space-x-8 mb-6">
                 <div>
                     <div class="counter" id="powerBlock1">0 MW</div>
-                    <p class="text-sm mt-1 md:mt-2" >Sajószentpéter I</p>
+                    <p class="text-lg mt-1 md:mt-2" >Sajószentpéter I</p>
                 </div>
                 <div>
                     <div class="counter" id="powerBlock2">0 MW</div>
-                    <p class="text-sm mt-1 md:mt-2">Sajószentpéter II</p>
+                    <p class="text-lg mt-1 md:mt-2">Sajószentpéter II</p>
                 </div>
             </div>
-            <div>
-                <p class="text-md mt-1 md:mt-2">Balesetmentes napok száma:</p>
-                <div class="small-counter" id="accidentFreeDays">0</div>
+            <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-6">
+                <div>
+                    <p class="secondary-counter-label">Balesetmentes napok száma:</p>
+                    <div class="secondary-counter-value" id="accidentFreeDays">0</div>
+                </div>
+                <div>
+                    <p class="secondary-counter-label">Ma megtermelt villamos energia:</p>
+                    <div class="secondary-counter-value" id="dailyEnergyGenerated">0 MWh</div>
+                </div>
             </div>
         </div>
     </section>
@@ -169,9 +180,9 @@
             <h3 class="text-2xl font-bold mb-6 text-center">Erőmű Adatok</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
                 <div class="space-y-3">
-                    <p><strong>Hátralévő energia az üzemanyagban:</strong> <span id="remainingEnergy">50000 MWh</span></p>
-                    <p><strong>Napi CO2 megtakarítás:</strong> <span id="dailyCO2">115 tonna</span></p>
-                    <p><strong>Összes CO2 megtakarítás:</strong> <span id="totalCO2">3400 tonna</span></p>
+                    <p><strong>Hátralévő energia az üzemanyagban:</strong> <span id="remainingEnergy">0 MWh</span></p>
+                    <p><strong>Napi CO2 megtakarítás:</strong> <span id="dailyCO2">0 tonna</span></p>
+                    <p><strong>Összes CO2 megtakarítás:</strong> <span id="totalCO2">0 tonna</span></p>
                     <p><strong>Hővel ellátott háztartások:</strong> 25000</p>
                 </div>
                 <div class="chart-container-wrapper w-full h-64 md:h-80">
@@ -202,7 +213,7 @@
                     </div>
                 </div>
                 <div>
-                    <p class="mb-1 text-center font-semibold">Országos lakossági átlagár (tájékoztató):</p>
+                    <p class="mb-1 text-center font-semibold">Országos lakossági átlagár:</p>
                     <p class="mb-1 text-center text-xl"><span id="nationalHeatPriceVal">2580</span> HUF/GJ</p>
                     <div class="progress-bar-container">
                         <div id="nationalHeatProgress" class="progress-bar bg-yellow-500" style="width: 0%;">
@@ -239,36 +250,43 @@
     <script>
         document.getElementById('currentYear').textContent = new Date().getFullYear();
 
-        function calculateAccidentFreeDays(startDateString) {
-            const startDate = new Date(startDateString);
+        const operationalStartDate = new Date("2025-05-20T00:00:00"); 
+
+        function calculateAccidentFreeDays() {
             const today = new Date();
-            const differenceInTime = today.getTime() - startDate.getTime();
+            const startDateForAccidentDays = new Date(operationalStartDate.getFullYear(), operationalStartDate.getMonth(), operationalStartDate.getDate());
+            const todayForAccidentDays = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+            
+            const differenceInTime = todayForAccidentDays.getTime() - startDateForAccidentDays.getTime();
+            if (differenceInTime < 0) return 0; 
             const differenceInDays = Math.floor(differenceInTime / (1000 * 3600 * 24));
             return differenceInDays;
         }
-        const accidentDays = calculateAccidentFreeDays("2025-05-20"); // Minta kezdődátum
-        document.getElementById('accidentFreeDays').textContent = accidentDays;
+        document.getElementById('accidentFreeDays').textContent = calculateAccidentFreeDays();
 
         // Számláló animáció a blokkokhoz
         let powerBlock1 = 0;
         let powerBlock2 = 0;
-        const targetPowerBlock1 = 77;
-        const targetPowerBlock2 = 77;
+        const targetPowerBlock1 = 150; // ÚJ ÉRTÉK
+        const targetPowerBlock2 = 150; // ÚJ ÉRTÉK
         const counterBlock1 = document.getElementById('powerBlock1');
         const counterBlock2 = document.getElementById('powerBlock2');
 
         const interval1 = setInterval(() => {
             if (powerBlock1 < targetPowerBlock1) {
-                powerBlock1 += 1;
+                powerBlock1 += Math.ceil((targetPowerBlock1 - powerBlock1) / 15); // Gyorsabb animáció
+                if (powerBlock1 > targetPowerBlock1) powerBlock1 = targetPowerBlock1;
                 counterBlock1.textContent = `${powerBlock1} MW`;
             } else { clearInterval(interval1); }
-        }, 20);
+        }, 50); // Gyorsabb frissítés az animációhoz
         const interval2 = setInterval(() => {
             if (powerBlock2 < targetPowerBlock2) {
-                powerBlock2 += 1;
+                powerBlock2 += Math.ceil((targetPowerBlock2 - powerBlock2) / 15); // Gyorsabb animáció
+                if (powerBlock2 > targetPowerBlock2) powerBlock2 = targetPowerBlock2;
                 counterBlock2.textContent = `${powerBlock2} MW`;
             } else { clearInterval(interval2); }
-        }, 20);
+        }, 50); // Gyorsabb frissítés az animációhoz
+
 
         // Chart.js grafikon
         const ctx = document.getElementById('powerChart').getContext('2d');
@@ -284,67 +302,88 @@
                     labels: ['06:00', '09:00', '12:00', '15:00', '18:00', '21:00'],
                     datasets: [{
                         label: 'Teljesítmény (MW)',
-                        data: [100, 105, 135, 144, 140, 135], // Adatsor a diagramhoz
+                        data: [220, 240, 270, 285, 275, 300], // ÚJ ADATSOR a 300MW kapacitáshoz
                         borderColor: '#1e90ff',
                         borderWidth: 2,
-                        fill: true,
-                        backgroundColor: gradient,
-                        tension: 0.1
+                        fill: true, 
+                        backgroundColor: gradient, 
+                        tension: 0.1 
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    scales: {
-                        y: { beginAtZero: true }
-                    },
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: 'top',
-                        }
-                    }
+                    scales: { y: { beginAtZero: true, suggestedMax: 320 } }, // Y tengely max javaslat
+                    plugins: { legend: { display: true, position: 'top' } }
                 }
             });
         }
 
         // Dinamikusan változó adatok
-        let currentDailyCO2 = 115.0;
-        let currentTotalCO2 = 3400.0;
-        let currentRemainingEnergy = 50000.0; // Kezdeti érték a hátralévő energiának
-
         const dailyCO2Element = document.getElementById('dailyCO2');
         const totalCO2Element = document.getElementById('totalCO2');
         const remainingEnergyElement = document.getElementById('remainingEnergy');
+        const dailyEnergyGeneratedElement = document.getElementById('dailyEnergyGenerated');
 
-        // Kezdeti értékek beállítása
-        dailyCO2Element.textContent = `${currentDailyCO2.toFixed(1)} tonna`;
-        totalCO2Element.textContent = `${currentTotalCO2.toFixed(0)} tonna`;
-        remainingEnergyElement.textContent = `${currentRemainingEnergy.toFixed(1)} MWh`;
+        const plantTotalCapacityMW = targetPowerBlock1 + targetPowerBlock2; // Most 300 MW
+        const co2SavedPerMWh = 0.5; 
+        const co2SavedPerHour = plantTotalCapacityMW * co2SavedPerMWh; 
 
-        setInterval(() => {
-            // Napi CO2 megtakarítás növelése
-            currentDailyCO2 += 0.2; // Növekmény 2 másodpercenként
-            dailyCO2Element.textContent = `${currentDailyCO2.toFixed(1)} tonna`;
+        const initialEnergyInFuel = 5256000; // MWh (kb. 2 évre elegendő 300 MW-on)
+        const energyGeneratedPerHour = plantTotalCapacityMW; 
 
-            // Összes CO2 megtakarítás növelése a napi növekmény ütemében
-            currentTotalCO2 += 0.2; // Ugyanannyival növeljük, mint a napit
-            totalCO2Element.textContent = `${currentTotalCO2.toFixed(0)} tonna`;
+        function updateCounters() {
+            const now = new Date();
+            
+            const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
+            let hoursSinceMidnightToday = (now.getTime() - startOfToday.getTime()) / (1000 * 60 * 60);
+            if (hoursSinceMidnightToday < 0) hoursSinceMidnightToday = 0;
 
-            // Hátralévő energia csökkentése
-            currentRemainingEnergy -= 0.1; // Csökkenés 2 másodpercenként
-            if (currentRemainingEnergy < 0) {
-                currentRemainingEnergy = 0; // Ne menjen mínuszba
+            if (operationalStartDate > startOfToday && operationalStartDate > now) {
+                 hoursSinceMidnightToday = 0;
+            } else if (operationalStartDate > startOfToday && operationalStartDate <= now) {
+                const millisecondsSinceOpStartToday = now.getTime() - operationalStartDate.getTime();
+                hoursSinceMidnightToday = millisecondsSinceOpStartToday / (1000 * 60 * 60);
+                if (hoursSinceMidnightToday < 0) hoursSinceMidnightToday = 0;
             }
-            remainingEnergyElement.textContent = `${currentRemainingEnergy.toFixed(1)} MWh`;
 
-        }, 2000); // Frissítés 2 másodpercenként
+            const currentDailyCO2 = hoursSinceMidnightToday * co2SavedPerHour;
+            if(dailyCO2Element) dailyCO2Element.textContent = `${currentDailyCO2.toFixed(1)} tonna`;
 
-        // Hőár Progressbarok Frissítése - Lakossági árak alapján
-        const ourPrice = 900;      // Ft/GJ - Borsod AtomTech Zrt. ára
-        const localPrice = 2791;   // Ft/GJ - Miskolc lakossági (MK_23_139, 5. mell.)
-        const nationalPrice = 2580;// Ft/GJ - Országos lakossági átlag (MK_23_139, 5. mell. alapján, tájékoztató)
-        const maxPrice = 4000;     // Ft/GJ - Referencia maximum lakossági árakhoz
+            const currentDailyEnergyGenerated = hoursSinceMidnightToday * energyGeneratedPerHour;
+            if(dailyEnergyGeneratedElement) dailyEnergyGeneratedElement.textContent = `${currentDailyEnergyGenerated.toFixed(0)} MWh`;
+
+            const totalOperationalMilliseconds = now.getTime() - operationalStartDate.getTime();
+            
+            if (totalOperationalMilliseconds < 0) { 
+                if(totalCO2Element) totalCO2Element.textContent = `0 tonna`;
+                if(remainingEnergyElement) remainingEnergyElement.textContent = `${initialEnergyInFuel.toFixed(0)} MWh`;
+                if(dailyCO2Element) dailyCO2Element.textContent = `0.0 tonna`;
+                if(dailyEnergyGeneratedElement) dailyEnergyGeneratedElement.textContent = `0 MWh`;
+                document.getElementById('accidentFreeDays').textContent = 0;
+                return;
+            }
+            const totalOperationalHours = totalOperationalMilliseconds / (1000 * 60 * 60);
+
+            const currentTotalCO2 = totalOperationalHours * co2SavedPerHour;
+            if(totalCO2Element) totalCO2Element.textContent = `${currentTotalCO2.toFixed(0)} tonna`;
+
+            const energyConsumedTotal = totalOperationalHours * energyGeneratedPerHour;
+            let currentRemainingEnergy = initialEnergyInFuel - energyConsumedTotal;
+            if (currentRemainingEnergy < 0) {
+                currentRemainingEnergy = 0;
+            }
+            if(remainingEnergyElement) remainingEnergyElement.textContent = `${currentRemainingEnergy.toFixed(0)} MWh`;
+        }
+        
+        updateCounters(); 
+        setInterval(updateCounters, 5000);
+
+        // Hőár Progressbarok
+        const ourPrice = 900;
+        const localPrice = 2791;
+        const nationalPrice = 2580;
+        const maxPrice = 4000;
 
         document.getElementById('ourHeatPriceVal').textContent = ourPrice;
         document.getElementById('localHeatPriceVal').textContent = localPrice;
